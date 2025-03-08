@@ -8,3 +8,13 @@ export class Util {
    }
 }
 
+export type Puzzle = {
+    name: string;
+    label: string;
+    size: number;
+    board: number[][];
+    };
+
+export interface PuzzleData {
+    puzzleList: Puzzle[];
+}
