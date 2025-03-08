@@ -31,7 +31,7 @@ function setBoard(puzzleSelected:string) : Board {
                board.setCellKnown(8,7,2); board.setCellKnown(2,8,9); board.setCellKnown(3,8,6); board.setCellKnown(5,8,5); board.setCellKnown(7,8,7);
                return board;
                break;
-               case "Puzzle88":
+          case "Puzzle88":
                board = new Board(9);
                board.setCellKnown(4,0,9); board.setCellKnown(7,0,7); board.setCellKnown(2,1,8); board.setCellKnown(8,1,3); board.setCellKnown(1,2,4);
                board.setCellKnown(5,2,6); board.setCellKnown(0,3,9); board.setCellKnown(4,3,1); board.setCellKnown(6,3,6); board.setCellKnown(0,4,1);
@@ -87,6 +87,8 @@ function setBoard(puzzleSelected:string) : Board {
                board.setCellKnown(3,15,4); board.setCellKnown(5,15,16); board.setCellKnown(8,15,12); board.setCellKnown(10,15,8); board.setCellKnown(12,15,15); board.setCellKnown(14,15,1);
                return board;
                break;
+          default:
+               console.log("Bad board name: "+puzzleSelected);
      }
      // Return empty board
      return board = new Board(9);
