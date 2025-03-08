@@ -73,4 +73,11 @@ function handleSelectPuzzle(): void {
           myBoard.printBoard(origText)
           myBoard.setupDone = true;
      }
+     // Pick original Choose option and board should be blank
+     else {
+          myBoard = setBoard(puzzleSelect.value);
+          origText.value="";
+          scanText.value="";
+          myBoard.setupDone = false;
+     }
 }
