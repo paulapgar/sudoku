@@ -6,7 +6,7 @@ import { PuzzleData } from './classes/util';
 import { origText } from './classes/util';
 import { scanText } from './classes/util';
 
-const puzzles: PuzzleData = require("./puzzles.json");
+const puzzles: PuzzleData = require("../build/puzzles.json");
 
 let myBoard : Board;
 
