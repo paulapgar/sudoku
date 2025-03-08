@@ -19,8 +19,8 @@ function setBoard(puzzleSelected:string) : Board {
                board = new Board(size);
                for (let y = 0; y < size; y++) {
                     for (let x = 0; x < size; x++) {
-                         if (puzzles.puzzleList[puz].board[x][y] > 0) {
-                              board.setCellKnown(y,x,puzzles.puzzleList[puz].board[x][y]);
+                         if (puzzles.puzzleList[puz].board[y][x] > 0) {
+                              board.setCellKnown(x,y,puzzles.puzzleList[puz].board[y][x]);
                          }
                     }
                }
