@@ -57,7 +57,7 @@ function handleClickOnScan(): void {
                count++;
           }
 
-          Util.appendText(scanText, "Finished With Board  " + "(" + count + " moves)");
+          Util.appendText(scanText, `Finished With Board  (${count} moves)`);
           myBoard.printBoard(scanText);
           scanText.scrollTop = scanText.scrollHeight;
           myBoard.setupDone = false;

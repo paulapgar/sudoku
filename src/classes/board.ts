@@ -53,7 +53,7 @@ export class Board {
         this.needEval = true;
         // Only display choice when Scanning starts
         if (this.setupDone === true) {
-            Util.appendText(scanText, "Set cell ("+x+","+y+") to "+known);
+            Util.appendText(scanText, `Set cell (${x},${y}) to ${known}`);
         }
 
         this.clearColumn(x, known);
@@ -165,10 +165,10 @@ export class Board {
                 cell = this.getCell(x, y);
                 if (cell.knownNum > 0) {
                     numStr = cell.knownNum.toString();
-                    a.push("[" + " ".repeat(width - numStr.length) + numStr + "]");
+                    a.push(`[${numStr.padStart(width)}]`);
                 }
                 else {
-                    a.push("[" + " ".repeat(width) + "]");
+                    a.push(`[${" ".repeat(width)}]`);
                 }
             }
             Util.appendText(text, a.join(""));
