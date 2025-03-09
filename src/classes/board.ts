@@ -5,7 +5,7 @@ import { Util } from './util';
 import { origText } from './util';
 import { scanText } from './util';
 
-type Cells = Map<number,Cell>; 
+type Cells = Map<number,Cell>;
 
 export class Board {
     private _boardSize: number = 0;

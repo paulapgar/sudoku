@@ -6,7 +6,21 @@ import { PuzzleData } from './classes/util';
 import { origText } from './classes/util';
 import { scanText } from './classes/util';
 
+// Load in the puzzles data from json file
 const puzzles: PuzzleData = require("../build/puzzles.json");
+
+const scanButton = document.getElementById("scan") as HTMLButtonElement;
+const puzzleSelect = document.getElementById("puzzles") as HTMLSelectElement;
+
+scanButton.addEventListener("click", handleClickOnScan);
+puzzleSelect.addEventListener("change", handleSelectPuzzle);
+
+for (const puz in puzzles.puzzleList) {
+     const optionElement = document.createElement('option');
+     optionElement.value = puzzles.puzzleList[puz].name;
+     optionElement.text = puzzles.puzzleList[puz].label;
+     puzzleSelect.add(optionElement);
+ }
 
 let myBoard : Board;
 
@@ -27,23 +41,9 @@ function setBoard(puzzleSelected:string) : Board {
                return board;
           }
      }
-
-     // Return empty board if not found
+     // Return empty board if selected puzzle not found
      return board = new Board(9);
 }
-
-const puzzleSelect = document.getElementById("puzzles") as HTMLSelectElement;
-for (const puz in puzzles.puzzleList) {
-    const optionElement = document.createElement('option');
-    optionElement.value = puzzles.puzzleList[puz].name;
-    optionElement.text = puzzles.puzzleList[puz].label;
-    puzzleSelect.add(optionElement);
-}
-
-puzzleSelect.addEventListener("change", handleSelectPuzzle);
-
-const scan = document.getElementById("scan") as HTMLButtonElement;
-scan.addEventListener("click", handleClickOnScan);
 
 function handleClickOnScan(): void {
      if (!myBoard) return;
