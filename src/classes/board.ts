@@ -41,14 +41,14 @@ export class Board {
     }
 
     private getCell(x: number, y: number): Cell {
-        // Guarantee we can grab a Cell instance from Map with !
-        // may have to reevaluate own Map implementation to make TS happy
-        // Maybe an Array<Cell>[] ?
-        return this._cells.get(this.getCellNum(x, y))!;
+        // Tell TS we guarantee grabbing a Cell instance from Map with "as Cell"
+        // We may have to reevaluate own Map implementation to make TS happy
+        // Perhaps an Array<Cell>[] ?
+        return this._cells.get(this.getCellNum(x, y)) as Cell;
     }
 
     public setCellKnown(x: number, y: number, known: number): void {
-        let cell: Cell = this.getCell(x, y);
+        let cell:Cell = this.getCell(x, y);
         cell.knownNum = known;
         this.needEval = true;
         // Only display choice when Scanning starts
@@ -123,21 +123,23 @@ export class Board {
                             let possNums:Array<number> = this.getCell(x, y).getPossNums();
                             // Add x,y Cell coordinates to map of numbers
                             possNums.forEach(num => { 
-                            // Guarantee we can grab an array from Map with !
-                            let a:number[][] = numMap.get(num)!;
-                            a.push([x,y]);
-                            numMap.set(num,a);
-                            });
+                                                    // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
+                                                    //let a:number[][] = numMap.get(num) as number[][];
+                                                    let a:number[][] = numMap.get(num) ?? [];
+                                                    a.push([x,y]);
+                                                    numMap.set(num,a);
+                                                    });
                         }
                     }
                 }
                 // Process array to find the only Cell with a possible number
                 // Need to figure out nicer way to do iterate numMap.forEach
-                for (let n: number = 1; n <= this._boardSize; n++) {
-                    // Guarantee we can grab an array from Map with !
-                    let a:number[][] = numMap.get(n)!;
+                for (let num: number = 1; num <= this._boardSize; num++) {
+                    // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
+                    //let a:number[][] = numMap.get(num) as number[][];
+                    let a:number[][] = numMap.get(num) ?? [];
                     if (a.length === 1) {
-                        this.setCellKnown(a[0][0], a[0][1], n);
+                        this.setCellKnown(a[0][0], a[0][1], num);
                         return true;
                     }
                 }
