@@ -1,9 +1,8 @@
 
 import { Cell } from './cell';
 import { Util } from './util';
-
-import { origText } from './util';
-import { scanText } from './util';
+import { Elements } from './util';
+import { Puzzle } from '../models/puzzles';
 
 type Cells = Map<number,Cell>;
 
@@ -12,12 +11,11 @@ export class Board {
     private _blockSize: number = 0;
     private _needEval: boolean = false;
     private _setupDone: boolean = false;
-
     private _cells:Cells = new Map([]);
 
-    public constructor (size: number) {
-        this._boardSize = size;
-
+    public constructor (puz: Puzzle) {
+        this._boardSize = puz.size;
+        
         switch (this._boardSize) {
             case 9: this._blockSize = 3; break;
             case 16: this._blockSize = 4; break;
@@ -25,13 +23,19 @@ export class Board {
                 console.log("Invalid boardSize!");
             break;
         }
-        
-        for (let j: number = 0; j < size; j++) {
-            for (let k: number = 0; k < size; k++) {
+        for (let j: number = 0; j < puz.size; j++) {
+            for (let k: number = 0; k < puz.size; k++) {
                 let cell:Cell = new Cell();
-                cell.populatePossNums(size);
+                cell.populatePossNums(puz.size);
                 this._cells.set(this.getCellNum(j, k), cell);
             }
+        }
+        for (let y = 0; y < puz.size; y++) {
+                for (let x = 0; x < puz.size; x++) {
+                    if (puz.board[y][x] > 0) {
+                        this.setCellKnown(x,y,puz.board[y][x]);
+                    }
+                }
         }
     }
 
@@ -53,7 +57,7 @@ export class Board {
         this.needEval = true;
         // Only display choice when Scanning starts
         if (this.setupDone === true) {
-            Util.appendText(scanText, `Set cell (${x},${y}) to ${known}`);
+            Util.appendText(Elements.scanText, `Set cell (${x},${y}) to ${known}`);
         }
 
         this.clearColumn(x, known);
@@ -150,9 +154,9 @@ export class Board {
 
     public processBoardStep(): void {
         this.needEval = false;
-        Util.appendText(scanText, "Scanner #1 try")
+        Util.appendText(Elements.scanText, "Scanner #1 try")
         if (this.processBoardBlockSingleNumber()) return;
-        Util.appendText(scanText, "Scanner #2 try")
+        Util.appendText(Elements.scanText, "Scanner #2 try")
         if (this.processBoardOnePossible()) return;
     }
 
