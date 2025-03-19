@@ -1,43 +1,52 @@
 
-// Possible Numbers, key is typically 1..N, use boolean to make Map to use its functions
-type PossNums = Map<number,boolean>;
+// Possible Numbers, true means possible for index+1
+type PossNums = Array<boolean>;
 
 export class Cell {
     private _knownNum: number = 0;
-    private _possNums: PossNums = new Map([]);
+    private _possNumsArray: PossNums = [];
 
     public populatePossNums(maxNum: number): void {
         for (let j: number = 1; j <= maxNum; j++) {
-            this._possNums.set(j, true);
+            this._possNumsArray.push(true);
         }
     }
 
     public clearPossNums(): void {
-        this._possNums.clear();
+        this._possNumsArray.fill(false);
     }
     
     public hasPossNum(num:number): boolean {
-        return this._possNums.has(num);
+        return this._possNumsArray[num-1];
     }
-    
+
+    // This is getting the actual numbers (index+1), not boolean flags
     public getPossNums(): Array<number> {
-        return Array.from(this._possNums.keys());
+        let poss: Array<number> = [];
+        for (let num:number = 0; num < this._possNumsArray.length; num++) {
+            if (this._possNumsArray[num] === true) {
+                poss.push(num+1);
+            }
+        }
+        return poss;
     }
 
     public onePossNumLeft(): number {
-        if (this._possNums.size === 1) {
-            let keys:Array<number> = Array.from(this._possNums.keys());
-            return keys[0];
+        let poss: Array<number> = [];
+        for (let num:number = 0; num < this._possNumsArray.length; num++) {
+            if (this._possNumsArray[num] === true) {
+                poss.push(num+1);
+            }
+        }
+        if (poss.length === 1) {
+            return poss[0];
         }
         // Can never have a value of 0, so this is treated as false
         return 0;
     }
 
     public removePossNum(num:number): void {
-        if (this._possNums.delete(num) === false) {
-            // we don't care about this for now, if ever, delete will ignore nonexistent keys
-            // console.log("Remove possible num doesn't exist ("+num+")");
-        } 
+        this._possNumsArray[num-1] = false;
     }
 
     public get knownNum() { return this._knownNum; }
@@ -45,7 +54,7 @@ export class Cell {
     // When we know the number, clear the possible numbers
     public set knownNum(num: number) {
         this._knownNum = num;
-        this._possNums.clear();
+        this.clearPossNums();
     }
 
 }
