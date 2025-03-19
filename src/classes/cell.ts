@@ -7,7 +7,7 @@ export class Cell {
     private _possNumsArray: PossNums = [];
 
     public populatePossNums(maxNum: number): void {
-        for (let j: number = 1; j <= maxNum; j++) {
+        for (let j: number = 0; j < maxNum; j++) {
             this._possNumsArray.push(true);
         }
     }
