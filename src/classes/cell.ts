@@ -32,12 +32,7 @@ export class Cell {
     }
 
     public onePossNumLeft(): number {
-        let poss: Array<number> = [];
-        for (let num:number = 0; num < this._possNumsArray.length; num++) {
-            if (this._possNumsArray[num] === true) {
-                poss.push(num+1);
-            }
-        }
+        let poss: Array<number> = this.getPossNums();
         if (poss.length === 1) {
             return poss[0];
         }
@@ -56,6 +51,5 @@ export class Cell {
         this._knownNum = num;
         this.clearPossNums();
     }
-
 }
 
