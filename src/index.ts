@@ -27,17 +27,17 @@ function handleClickOnScan(): void {
           Elements.scanText.value="";
           let count: number = -1;
           while (Game.board.needEval === true) {
-               Game.board.processBoardStep();
+               Board.processBoardStep(Game.board);
                count++;
           }
  
           Util.appendText(Elements.scanText, `Finished With Board  (${count} moves)`);
-          Game.board.printBoard(Elements.scanText);
+          Board.printBoard(Game.board, Elements.scanText);
           Elements.scanText.scrollTop = Elements.scanText.scrollHeight;
           Game.board.setupDone = false;
      }
 }
- 
+
 function handleSelectPuzzle(): void {
      if (Elements.puzzleSelect.value !== "Choose") {
           for (const puz in puzzleList) {
@@ -48,10 +48,10 @@ function handleSelectPuzzle(): void {
           Elements.origText.value="";
           Elements.scanText.value="";
           Util.appendText(Elements.origText, "Initial Board");
-          Game.board.printBoard(Elements.origText)
+          Board.printBoard(Game.board, Elements.origText)
           Game.board.setupDone = true;
      }
-     // Pick original Choose option
+     // Just blank out text display, perhaps later set Blank board
      else {
           //Game.board = new Object();
           Elements.origText.value="";

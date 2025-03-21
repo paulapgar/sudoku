@@ -1,5 +1,5 @@
 
-// Possible Numbers, true means possible for index+1
+// Possible Numbers, true means possible for number guess index+1
 type PossNums = Array<boolean>;
 
 export class Cell {
@@ -20,7 +20,7 @@ export class Cell {
         return this._possNumsArray[num-1];
     }
 
-    // This is getting the actual numbers (index+1), not boolean flags
+    // This is getting the actual numbers (index+1), not boolean flags or array positions
     public getPossNums(): Array<number> {
         let poss: Array<number> = [];
         for (let num:number = 0; num < this._possNumsArray.length; num++) {

@@ -86,21 +86,21 @@ export class Board {
         // Clear all the possible numbers within Block for Known
         for (let j: number = blockStartX; j < (blockStartX + this._blockSize); j++) {
             for (let k: number = blockStartY; k < (blockStartY + this._blockSize); k++) {
-                if ((j !== x) || (k !== y)) {
-                    this.getCell(j, k).removePossNum(known);
-                }
+                this.getCell(j, k).removePossNum(known);
             }
         }
     }
 
+    // Static Methods
+
     // Return true if board changed and needs to be reevaluated
-    private processBoardOnePossible(): boolean {
+    private static processBoardOnePossible(board: Board): boolean {
         // Go through each Cell and if there is only one possibility left, that is the Known number
-        for (let j: number = 0; j < this._boardSize; j++) {
-            for (let k: number = 0; k < this._boardSize; k++) {
-                let known:number = this.getCell(j, k).onePossNumLeft();
+        for (let j: number = 0; j < board.boardSize; j++) {
+            for (let k: number = 0; k < board.boardSize; k++) {
+                let known:number = board.getCell(j, k).onePossNumLeft();
                 if (known > 0) {
-                    this.setCellKnown(j, k, known);
+                    board.setCellKnown(j, k, known);
                     return true;
                 }
             }
@@ -109,22 +109,22 @@ export class Board {
     }
 
     // Return true if board changed and needs to be reevaluated
-    private processBoardBlockSingleNumber(): boolean {
+    private static processBoardBlockSingleNumber(board: Board): boolean {
         let blockX, blockY, maxBlockX, maxBlockY : number;
-        maxBlockX = this._boardSize / this._blockSize;
-        maxBlockY = this._boardSize / this._blockSize;
+        maxBlockX = board.boardSize / board.blockSize;
+        maxBlockY = board.boardSize / board.blockSize;
 
         for (let j: number = 0; j < maxBlockX; j++) {
             for (let k: number = 0; k < maxBlockY; k++) {
                 // Start block checks
                 let numMap:Map<number,number[][]> = new Map();
                 // numMap[1...N]   -  does NOT start at 0
-                for (let n: number = 1; n <= this._boardSize; n++) { numMap.set(n,[]); }
+                for (let n: number = 1; n <= board.boardSize; n++) { numMap.set(n,[]); }
                 
                 for (let x: number = j * maxBlockX; x < j * maxBlockX + maxBlockX; x++) {
                     for (let y: number = k * maxBlockY; y < k * maxBlockY + maxBlockY; y++) {
-                        if (this.getCell(x, y).knownNum === 0) {
-                            let possNums:Array<number> = this.getCell(x, y).getPossNums();
+                        if (board.getCell(x, y).knownNum === 0) {
+                            let possNums:Array<number> = board.getCell(x, y).getPossNums();
                             // Add x,y Cell coordinates to map of numbers
                             possNums.forEach(num => { 
                                                     // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
@@ -138,12 +138,12 @@ export class Board {
                 }
                 // Process array to find the only Cell with a possible number
                 // Need to figure out nicer way to do iterate numMap.forEach
-                for (let num: number = 1; num <= this._boardSize; num++) {
+                for (let num: number = 1; num <= board.boardSize; num++) {
                     // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
                     //let a:number[][] = numMap.get(num) as number[][];
                     let a:number[][] = numMap.get(num) ?? [];
                     if (a.length === 1) {
-                        this.setCellKnown(a[0][0], a[0][1], num);
+                        board.setCellKnown(a[0][0], a[0][1], num);
                         return true;
                     }
                 }
@@ -152,23 +152,24 @@ export class Board {
         return false;
     }
 
-    public processBoardStep(): void {
-        this.needEval = false;
+    public static processBoardStep(board: Board): void {
+        board.needEval = false;
         Util.appendText(Elements.scanText, "Scanner #1 try")
-        if (this.processBoardBlockSingleNumber()) return;
+        if (Board.processBoardBlockSingleNumber(board)) return;
         Util.appendText(Elements.scanText, "Scanner #2 try")
-        if (this.processBoardOnePossible()) return;
+        if (Board.processBoardOnePossible(board)) return;
     }
 
-    public printBoard(text: HTMLTextAreaElement) {
+    public static printBoard(board: Board, text: HTMLTextAreaElement) {
         let cell: Cell;
-        let width: number = this._boardSize > 9 ? 2 : 1;
+        let width: number = board.boardSize > 9 ? 2 : 1;
         let numStr: string;
-        
-        for (let y: number = 0; y < this._boardSize; y++) {
+        let size = board.boardSize;
+
+        for (let y: number = 0; y < size; y++) {
             let a: Array<string> = [];
-            for (let x: number = 0; x < this._boardSize; x++) {
-                cell = this.getCell(x, y);
+            for (let x: number = 0; x < size; x++) {
+                cell = board.getCell(x, y);
                 if (cell.knownNum > 0) {
                     numStr = cell.knownNum.toString();
                     a.push(`[${numStr.padStart(width)}]`);
@@ -181,8 +182,15 @@ export class Board {
         }
     }
 
+    public get boardSize() { return this._boardSize; }
+    private set boardSize(size: number) { this._boardSize = size; }
+
+    public get blockSize() { return this._blockSize; }
+    private set blockSize(size: number) { this._blockSize = size; }
+
     public get setupDone() { return this._setupDone; }
     public set setupDone(modified: boolean) { this._setupDone = modified; }
+
     public get needEval() { return this._needEval; }
     private set needEval(modified: boolean) { this._needEval = modified; }
 }
