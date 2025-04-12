@@ -11,11 +11,13 @@ export class Board {
     private _blockSize: number = 0;
     private _needEval: boolean = false;
     private _setupDone: boolean = false;
+    private _puzzleLabel: string = "";
     private _cells:Cells = new Map([]);
 
     public constructor (puz: Puzzle) {
         this._boardSize = puz.size;
-        
+        this._puzzleLabel = puz.label;
+
         switch (this._boardSize) {
             case 9: this._blockSize = 3; break;
             case 16: this._blockSize = 4; break;
@@ -51,9 +53,12 @@ export class Board {
         return this._cells.get(this.getCellNum(x, y)) as Cell;
     }
 
+    public getCellKnown(x: number, y: number): number {
+        return this.getCell(x, y).knownNum;
+    }
+    
     public setCellKnown(x: number, y: number, known: number): void {
-        let cell:Cell = this.getCell(x, y);
-        cell.knownNum = known;
+        this.getCell(x, y).knownNum = known;
         this.needEval = true;
         // Only display choice when Scanning starts
         if (this.setupDone === true) {
@@ -93,7 +98,7 @@ export class Board {
 
     // Static Methods
 
-    // Return true if board changed and needs to be reevaluated
+    // Return true if board changes and needs to be reevaluated
     private static processBoardOnePossible(board: Board): boolean {
         // Go through each Cell and if there is only one possibility left, that is the Known number
         for (let j: number = 0; j < board.boardSize; j++) {
@@ -136,16 +141,84 @@ export class Board {
                         }
                     }
                 }
-                // Process array to find the only Cell with a possible number
-                // Need to figure out nicer way to do iterate numMap.forEach
-                for (let num: number = 1; num <= board.boardSize; num++) {
-                    // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
-                    //let a:number[][] = numMap.get(num) as number[][];
-                    let a:number[][] = numMap.get(num) ?? [];
-                    if (a.length === 1) {
-                        board.setCellKnown(a[0][0], a[0][1], num);
+                // Process array to find the only number with a possible single Cell
+                numMap.forEach((value, key) => {
+                    if (value.length === 1) {
+                        board.setCellKnown(value[0][0], value[0][1], key);
                         return true;
                     }
+                })
+            }
+        }
+        return false;
+    }
+
+    // Return true if board changes and needs to be reevaluated
+    private static processBoardOnePossibleInRow(board: Board): boolean {
+        // Go through each Cell and if there is only one possibility left for a Cell across a row, that is the Known number
+        for (let x: number = 0; x < board.boardSize; x++) {
+            for (let y: number = 0; y < board.boardSize; y++) {
+                if (board.getCellKnown(x,y) === 0) {
+                    let numMap:Map<number,number[][]> = new Map();
+                    // numMap[1...N]   -  does NOT start at 0
+                    for (let n: number = 1; n <= board.boardSize; n++) { numMap.set(n,[]); }
+
+                    for (let j: number = 0; j < board.boardSize; j++) {
+                        if (board.getCell(j, y).knownNum === 0) {
+                            let possNums:Array<number> = board.getCell(j, y).getPossNums();
+                            // Add x,y Cell coordinates to map of numbers
+                            possNums.forEach(num => { 
+                                                    // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
+                                                    //let a:number[][] = numMap.get(num) as number[][];
+                                                    let a:number[][] = numMap.get(num) ?? [];
+                                                    a.push([j,y]);
+                                                    numMap.set(num,a);
+                                                    });
+                        }
+                    }
+                    // Process array to find the only number with a possible single Cell
+                    numMap.forEach((value, key) => {
+                        if (value.length === 1) {
+                            board.setCellKnown(value[0][0], value[0][1], key);
+                            return true;
+                        }
+                    })
+                }
+            }
+        }
+        return false;
+    }
+
+    // Return true if board changes and needs to be reevaluated
+    private static processBoardOnePossibleInColumn(board: Board): boolean {
+        // Go through each Cell and if there is only one possibility left for a Cell within a Column, that is the Known number
+        for (let x: number = 0; x < board.boardSize; x++) {
+            for (let y: number = 0; y < board.boardSize; y++) {
+                if (board.getCellKnown(x,y) === 0) {
+                    let numMap:Map<number,number[][]> = new Map();
+                    // numMap[1...N]   -  does NOT start at 0
+                    for (let n: number = 1; n <= board.boardSize; n++) { numMap.set(n,[]); }
+
+                    for (let k: number = 0; k < board.boardSize; k++) {
+                        if (board.getCell(x, k).knownNum === 0) {
+                            let possNums:Array<number> = board.getCell(x, k).getPossNums();
+                            // Add x,y Cell coordinates to map of numbers
+                            possNums.forEach(num => { 
+                                                    // Guarantee we can grab an array of arrays [x,y] from Map (could be empty [])
+                                                    //let a:number[][] = numMap.get(num) as number[][];
+                                                    let a:number[][] = numMap.get(num) ?? [];
+                                                    a.push([x,k]);
+                                                    numMap.set(num,a);
+                                                    });
+                        }
+                    }
+                    // Process array to find the only number with a possible single Cell
+                    numMap.forEach((value, key) => {
+                        if (value.length === 1) {
+                            board.setCellKnown(value[0][0], value[0][1], key);
+                            return true;
+                        }
+                    })
                 }
             }
         }
@@ -158,6 +231,10 @@ export class Board {
         if (Board.processBoardBlockSingleNumber(board)) return;
         Util.appendText(Elements.scanText, "Scanner #2 try")
         if (Board.processBoardOnePossible(board)) return;
+        Util.appendText(Elements.scanText, "Scanner #3 try")
+        if (Board.processBoardOnePossibleInRow(board)) return;
+        Util.appendText(Elements.scanText, "Scanner #4 try")
+        if (Board.processBoardOnePossibleInColumn(board)) return;
     }
 
     public static printBoard(board: Board, text: HTMLTextAreaElement) {
@@ -184,6 +261,9 @@ export class Board {
 
     public get boardSize() { return this._boardSize; }
     private set boardSize(size: number) { this._boardSize = size; }
+
+    public get puzzleLabel() { return this._puzzleLabel; }
+    private set puzzleLabel(name: string) { this._puzzleLabel = name; }
 
     public get blockSize() { return this._blockSize; }
     private set blockSize(size: number) { this._blockSize = size; }
